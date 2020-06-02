@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.rivers.model.Model;
+import it.polito.tdp.rivers.model.River;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,7 +27,7 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxRiver"
-    private ComboBox<?> boxRiver; // Value injected by FXMLLoader
+    private ComboBox<River> boxRiver; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtStartDate"
     private TextField txtStartDate; // Value injected by FXMLLoader
@@ -47,8 +49,50 @@ public class FXMLController {
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
+    
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
+    @FXML
+    void handleRiver(ActionEvent event) {
+		River r = boxRiver.getSelectionModel().getSelectedItem();
+    	if (r != null)
+    	{
+    		model.addFlows(r);
+    		txtStartDate.setText(r.getMinDay().toString());
+    		txtEndDate.setText(r.getMaxDay().toString());
+    		txtFMed.setText("" + r.getFlowAvg());
+    		txtNumMeasurements.setText("" + r.getFlows().size());
+    	}
+    }
+
+    @FXML
+    void handleSimula(ActionEvent event) {
+    	try {
+
+	    	River r = boxRiver.getSelectionModel().getSelectedItem();
+	    	double k = 0.0;
+	    	
+	    	if (r==null)
+	    		txtResult.setText("Non è stato selezionato alcun fiume. Ritenta dopo aver effettuato la scelta.");
+    	
+    		if (txtK.getText() == "")
+    			throw new NullPointerException("Non è stato inserito alcun valore relativo a K. Ritenta dopo aver compiuto la scelta.");
+    		k = Double.parseDouble(txtK.getText());
+    		
+        	
+        	if (k== 0.0)
+        		txtResult.setText("Inserire un valore maggiore di zero");
+        	
+        	String simStats  = model.getStats(r, k);
+        	
+        	txtResult.setText(simStats);
+    		
+    	} catch (Exception e) {
+    		txtResult.setText(e.getMessage());
+    	}
+
+    }
+
+    @FXML
     void initialize() {
         assert boxRiver != null : "fx:id=\"boxRiver\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtStartDate != null : "fx:id=\"txtStartDate\" was not injected: check your FXML file 'Scene.fxml'.";
@@ -58,9 +102,12 @@ public class FXMLController {
         assert txtK != null : "fx:id=\"txtK\" was not injected: check your FXML file 'Scene.fxml'.";
         assert btnSimula != null : "fx:id=\"btnSimula\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
+
     }
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	boxRiver.getItems().addAll(model.getAllRivers());
     }
 }
