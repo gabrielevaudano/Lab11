@@ -81,8 +81,8 @@ public class Simulator {
 		if (flowIn <= 0.0 || flowOut <= 0.0)
 			throw new InvalidParameterException("Ci sono stati problemi nella gestione del flusso. Ritenta la simulazione o controlla che il database sia funzionante.");
 		
-		if (flowIn <= flowOut) {
-			giorniNonGarantiti = getGiorniNonGarantiti() + 1;
+		if (flowDifference + capienzaAttuale <= 0.0) {
+			this.giorniNonGarantiti ++;
 			// non aumento la capienza in quanto esce tutta l'acqua che entra, il bilancio dunque è nullo
 			quantitaTotaleNonGarantita += Math.abs(flowDifference);
 		}
@@ -97,7 +97,7 @@ public class Simulator {
 		this.giorniTotali++;
 		this.capienzaCumulata += capienzaAttuale;
 		
-		System.out.println("EROGAZIONE FLUSSO: " + f.getDay() + ", DIFFERENZA DI FLUSSO: " + flowDifference + "CON UN FLUSSO MINIMO DI " + flowOut + ";");
+		System.out.println("EROGAZIONE FLUSSO: " + f.getDay() + ", DIFFERENZA DI FLUSSO: " + flowDifference + " E CAPIENZA ATTUALE DI " + capienzaAttuale + ";");
 	}
 
 	private double calculateFlowOut() {
